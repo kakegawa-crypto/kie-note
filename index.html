@@ -496,7 +496,25 @@
   let myId = null;
   let otherId = null;
   const seenIds = new Set();
-  let entrySince = '10m'; // catch up on the last 10 minutes when connecting, so a note sent just before the other side opens isn't missed
+
+  // "cutoff" is a unix-seconds timestamp persisted in this browser: notes at
+  // or before it are considered permanently read and are never shown again,
+  // even across reloads or re-logins on this device.
+  const CUTOFF_KEY = 'kie-note:cutoff';
+  function getCutoff(){
+    try{ return localStorage.getItem(CUTOFF_KEY); }catch(e){ return null; }
+  }
+  function setCutoff(unixSeconds){
+    try{ localStorage.setItem(CUTOFF_KEY, String(unixSeconds)); }catch(e){ /* private mode etc - degrade silently */ }
+  }
+  function advanceCutoff(unixSeconds){
+    const current = parseInt(getCutoff() || '0', 10);
+    if(isNaN(current) || unixSeconds >= current){
+      setCutoff(unixSeconds + 1); // +1 so this exact second's message isn't replayed next time
+    }
+  }
+
+  let entrySince = getCutoff() || 'all'; // resume from where this device last left off
 
   const landing = document.getElementById('landing');
   const pinScreen = document.getElementById('pinScreen');
@@ -626,13 +644,15 @@
   // looks like a doodle, actually skips past anything currently pending
   // (ntfy.sh has no bulk-delete API for a third party, so this makes the next
   // notebook connection start "now" - anything published before this moment
-  // will never be delivered to this device)
+  // will never be delivered to this device again, permanently)
   wipeDoodle.addEventListener('click', (e)=>{
     e.preventDefault();
     wipeDoodle.classList.remove('zapped');
     void wipeDoodle.offsetWidth;
     wipeDoodle.classList.add('zapped');
-    entrySince = Math.floor(Date.now() / 1000).toString();
+    const now = Math.floor(Date.now() / 1000);
+    entrySince = String(now);
+    setCutoff(now);
   });
 
   function unlockLanding(){
@@ -688,14 +708,43 @@
     return Math.min(MAX_MS, Math.max(MIN_MS, text.length * CHAR_MS));
   }
 
-  function consumeNote(el, text){
+  function isForeground(){
+    return document.visibilityState === 'visible' && document.hasFocus();
+  }
+
+  function crossOutAndRemove(el){
+    el.classList.add('consuming');
     setTimeout(()=>{
-      el.classList.add('consuming');
-      setTimeout(()=>{
-        el.classList.add('tossed');
-        setTimeout(()=> el.remove(), 900);
-      }, 500);
-    }, readDelay(text));
+      el.classList.add('tossed');
+      setTimeout(()=> el.remove(), 900);
+    }, 500);
+  }
+
+  function consumeNote(el, text){
+    const start = ()=> setTimeout(()=> crossOutAndRemove(el), readDelay(text));
+
+    if(isForeground()){
+      start();
+      return;
+    }
+    // arrived while the tab was backgrounded/unfocused - wait until the
+    // person actually comes back to look before the clock starts ticking
+    const onForeground = ()=>{
+      if(isForeground()){
+        document.removeEventListener('visibilitychange', onForeground);
+        window.removeEventListener('focus', onForeground);
+        start();
+      }
+    };
+    document.addEventListener('visibilitychange', onForeground);
+    window.addEventListener('focus', onForeground);
+  }
+
+  // the sender's own copy self-destructs on a fixed clock, independent of
+  // whether the other side has read it yet
+  const SELF_DESTRUCT_MS = 30000;
+  function selfDestruct(el){
+    setTimeout(()=> crossOutAndRemove(el), SELF_DESTRUCT_MS);
   }
 
   function genId(){
@@ -717,7 +766,8 @@
   async function addAndShare(text){
     const ts = Date.now();
     const note = { id: genId(), sender: myId, text, ts };
-    addNote({ text, ts, mine: true });
+    const el = addNote({ text, ts, mine: true });
+    selfDestruct(el);
     seenIds.add(note.id);
     await publishNote(note);
   }
@@ -730,6 +780,9 @@
     mainEventSource.onmessage = (e)=>{
       let evt;
       try{ evt = JSON.parse(e.data); }catch(err){ return; }
+      if(evt.event === 'message' && typeof evt.time === 'number'){
+        advanceCutoff(evt.time);
+      }
       let n;
       try{ n = JSON.parse(evt.message); }catch(err){ return; }
       if(!n || !n.id || !n.sender || typeof n.text !== 'string') return;
