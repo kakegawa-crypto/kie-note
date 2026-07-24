@@ -702,9 +702,9 @@
 
   // longer notes stay on screen longer before they're crossed out and cleared
   function readDelay(text){
-    const CHAR_MS = 90;   // rough reading pace per character
-    const MIN_MS = 1800;  // floor, so even one word doesn't flash
-    const MAX_MS = 15000; // ceiling, so a max-length note doesn't sit forever
+    const CHAR_MS = 45;   // rough reading pace per character
+    const MIN_MS = 900;   // floor, so even one word doesn't flash
+    const MAX_MS = 7000;  // ceiling, so a max-length note doesn't sit forever
     return Math.min(MAX_MS, Math.max(MIN_MS, text.length * CHAR_MS));
   }
 
