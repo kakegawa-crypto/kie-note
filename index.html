@@ -52,6 +52,18 @@
   input, textarea{ -webkit-user-select: text; user-select: text; }
   .hand{ font-family:'Yomogi', cursive; }
 
+  .deco{
+    position: fixed;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .deco-tl{ top: 24px; left: 18px; width: 40px; height: 60px; }
+  .deco-tr{ top: 40px; right: 24px; width: 64px; height: 32px; }
+  .deco-br{ bottom: 20px; right: 10px; width: 110px; height: 110px; }
+  @media (max-height: 700px){
+    .deco{ display:none; }
+  }
+
   /* ---------- Landing: choose notebook ---------- */
   #landing{
     display:none;
@@ -61,10 +73,11 @@
   }
   .app-title{
     font-family:'Yomogi', cursive;
-    font-size: 34px;
+    font-size: 40px;
     margin: 0 0 4px;
     color: var(--ink);
   }
+  #landing .app-title{ margin-bottom: 34px; }
   .app-sub{
     font-size: 12.5px;
     color: var(--ink-dim);
@@ -82,13 +95,23 @@
     border-radius: 6px 10px 10px 6px;
     cursor:pointer;
     position:relative;
-    box-shadow: 0 10px 22px var(--shadow);
+    box-shadow:
+      0 14px 26px var(--shadow),
+      4px 6px 0 0 var(--card-edge),
+      8px 12px 0 0 var(--paper-line);
     transition: transform .18s ease, box-shadow .18s ease;
     border:none;
     padding:0;
     overflow:hidden;
+    margin: 0 8px 10px 0;
   }
-  .book:hover{ transform: translateY(-4px); box-shadow: 0 16px 30px var(--shadow); }
+  .book:hover{
+    transform: translateY(-4px);
+    box-shadow:
+      0 20px 34px var(--shadow),
+      4px 6px 0 0 var(--card-edge),
+      8px 12px 0 0 var(--paper-line);
+  }
   .book.a{ background: linear-gradient(160deg, #7f97b8, #566d8f); }
   .book.b{ background: linear-gradient(160deg, #e0b96e, #c3903f); }
   .book .spine{
@@ -415,9 +438,23 @@
 </head>
 <body>
 
+<svg class="deco deco-tl" viewBox="0 0 60 90" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path d="M20 8 C36 8, 40 22, 40 34 L40 62 C40 74, 30 80, 22 74 C15 69, 16 60, 24 58 L24 30"
+        fill="none" stroke="#8a8172" stroke-width="3" stroke-linecap="round" opacity="0.35"/>
+</svg>
+
+<svg class="deco deco-br" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <circle cx="60" cy="60" r="42" fill="none" stroke="#8a8172" stroke-width="3" opacity="0.16"/>
+  <circle cx="60" cy="60" r="42" fill="none" stroke="#8a8172" stroke-width="2" opacity="0.1" transform="rotate(8 60 60)"/>
+</svg>
+
+<svg class="deco deco-tr" viewBox="0 0 80 40" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+  <path d="M6 30 C 20 10, 34 34, 48 14 C 58 2, 68 10, 74 6"
+        fill="none" stroke="#4a5a78" stroke-width="2.5" stroke-linecap="round" opacity="0.22"/>
+</svg>
+
 <div id="landing">
   <p class="app-title">メモ</p>
-  <p class="app-sub">かんたんメモ帳</p>
   <div class="book-row">
     <button class="book a" data-id="A">
       <span class="spine"></span>
@@ -428,7 +465,7 @@
       <span class="label">プライベート<small>開く</small></span>
     </button>
   </div>
-  <p class="hint">前回のメモは自動で片付けられます。<br>使うノートを選んでください。</p>
+  <p class="hint">使うノートを選んでください。</p>
 </div>
 
 <div id="pinScreen">
