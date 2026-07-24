@@ -496,7 +496,7 @@
   let myId = null;
   let otherId = null;
   const seenIds = new Set();
-  let entrySince = null; // set by the wipe doodle to skip anything published before "now"
+  let entrySince = '10m'; // catch up on the last 10 minutes when connecting, so a note sent just before the other side opens isn't missed
 
   const landing = document.getElementById('landing');
   const pinScreen = document.getElementById('pinScreen');
@@ -725,7 +725,7 @@
   let mainEventSource = null;
 
   function startPolling(){
-    const url = NTFY_BASE + '/sse' + (entrySince ? ('?since=' + encodeURIComponent(entrySince)) : '');
+    const url = NTFY_BASE + '/sse?since=' + encodeURIComponent(entrySince);
     mainEventSource = new EventSource(url);
     mainEventSource.onmessage = (e)=>{
       let evt;
