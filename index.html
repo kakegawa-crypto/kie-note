@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#f3ecd9">
+<title>MEMO</title>
+<meta name="apple-mobile-web-app-title" content="MEMO">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAE2UlEQVR4nO3dMW7UTBiH8V20PQUtJTfgDDlD6jSLENJKERVVlIoKIUVCiG1S5wwRR8gBIlGmTIooF6Awssza//HY884749Xzq+BLGI++fTJrj9ewfnm8XwFDXpWeAOpFHJCIAxJxQCIOSMQBiTggEQck4oC0yTHozx+/ur/9+OkDIy9r5Mbadvv8YLpdiVNnZJ+RuyzfVgIzHv0qI9cw8gGzlaM7p4N4A19i5HpG7rM/Ie1Py2qhY2SfkVs2cbTNqvm1/33qosfIPiMP4lIWEnFAIg5IxAHJJo7R86DRMylGLjvyIPuVoz9vq20ZRvYZuWW5fT46udk5M7LPyAcsV47wnFJmzMg+Ix8wvvHWWOJ9SEbuyxIHjgOXspCIAxJxQCIOSMQBiTggEQck4oC0eX56KD0HVIqVA9Lm9Zu3peeASrFyQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJB44g0SKwcknniDxMoBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQOKJN0isHJB44g0SKwck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiSfeILFyQOKJN0isHJCIAxJxQNqUngD+c7c9D3/D+/13n5msVqv1y+O928HQN1pDWNZWiKOMxCb6clRCHN7Ms+iyTYQ4/GTNossqEa5WnLiVYXgsVo7sPLM4kLiEsHLkVbCM9KNXsXKc7q7bX99cnRWcia2yZbRmrx/l4+iW0TiOPuaVMfpCZhp2UMk4+lm0lt7HpJdw9k927qMUiyNQRmO5fcS/ZibXnPkOVyaO0TIaS+wj8qUy39DMcdwCVyuRZUz6zmXJsdW9+O3z0ZOMwW9Y0PpRwz1Vwzn4rRwxp5+DHZzuro9jCfG52254FKc44i9M1DpRfx/hH1nPz2GEjxV/AusRx9RL1uX2sQjxmeY950jcyVjQKUg9y0arP6Wp08i4cqTvcalTkPlzctS+EkXKMDlurifetpe36kv7i5P4g+4vTvpDne6u9xcn8yfn4vnp4d3Xz80vSs/ln6kzsV85tpe34TKmDjj4RwKH8Pfny7fSU4gydZ7G5xz5bpfUfP6R/u6ez8Hciu2QZr2Rtujzj4Uyi8PhFit9ODOII7CDeXN1Zrvy04en1Dj8P5Nx3FvsVUmKo9SnddhC9TE/jrKf46IPB3MuZav6eF8Nl7iDe+c1XM0mXmNPXjmqKkMd1Hn9qKGDGNnvragCCu5H1dDHoLvteSVPJ8wz55yj/2IU36mscEptFqX6SD/uzO3z9uey+GvQVXZWVd21D0wm+8cEm//7VZWxqnVWtYlfUco/8XZMKlk8rKbBg9R+fE4+DI/CymEs5rXJtISYH5qVo4AcS0iOMVk57PGsLEJ4yh4h/P0cCKlk73z2ysQJaUY13JBLmQNx5FW2j8Sj87bixPktxiTK9cP97/RREMPt2afmSbt0xOEtayJWWTR4WymDfzUB4/j3VhCrhr9VrEUckNjngEQckIgDEnFAIg5IxAGJOCARByTigEQckP4CAveXJz32UzUAAAAASUVORK5CYII=">
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAE2UlEQVR4nO3dMW7UTBiH8V20PQUtJTfgDDlD6jSLENJKERVVlIoKIUVCiG1S5wwRR8gBIlGmTIooF6Awssza//HY884749Xzq+BLGI++fTJrj9ewfnm8XwFDXpWeAOpFHJCIAxJxQCIOSMQBiTggEQck4oC0yTHozx+/ur/9+OkDIy9r5Mbadvv8YLpdiVNnZJ+RuyzfVgIzHv0qI9cw8gGzlaM7p4N4A19i5HpG7rM/Ie1Py2qhY2SfkVs2cbTNqvm1/33qosfIPiMP4lIWEnFAIg5IxAHJJo7R86DRMylGLjvyIPuVoz9vq20ZRvYZuWW5fT46udk5M7LPyAcsV47wnFJmzMg+Ix8wvvHWWOJ9SEbuyxIHjgOXspCIAxJxQCIOSMQBiTggEQck4oC0eX56KD0HVIqVA9Lm9Zu3peeASrFyQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJB44g0SKwcknniDxMoBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQOKJN0isHJB44g0SKwck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiTggEQck4oBEHJCIAxJxQCIOSMQBiSfeILFyQOKJN0isHJCIAxJxQNqUngD+c7c9D3/D+/13n5msVqv1y+O928HQN1pDWNZWiKOMxCb6clRCHN7Ms+iyTYQ4/GTNossqEa5WnLiVYXgsVo7sPLM4kLiEsHLkVbCM9KNXsXKc7q7bX99cnRWcia2yZbRmrx/l4+iW0TiOPuaVMfpCZhp2UMk4+lm0lt7HpJdw9k927qMUiyNQRmO5fcS/ZibXnPkOVyaO0TIaS+wj8qUy39DMcdwCVyuRZUz6zmXJsdW9+O3z0ZOMwW9Y0PpRwz1Vwzn4rRwxp5+DHZzuro9jCfG52254FKc44i9M1DpRfx/hH1nPz2GEjxV/AusRx9RL1uX2sQjxmeY950jcyVjQKUg9y0arP6Wp08i4cqTvcalTkPlzctS+EkXKMDlurifetpe36kv7i5P4g+4vTvpDne6u9xcn8yfn4vnp4d3Xz80vSs/ln6kzsV85tpe34TKmDjj4RwKH8Pfny7fSU4gydZ7G5xz5bpfUfP6R/u6ez8Hciu2QZr2Rtujzj4Uyi8PhFit9ODOII7CDeXN1Zrvy04en1Dj8P5Nx3FvsVUmKo9SnddhC9TE/jrKf46IPB3MuZav6eF8Nl7iDe+c1XM0mXmNPXjmqKkMd1Hn9qKGDGNnvragCCu5H1dDHoLvteSVPJ8wz55yj/2IU36mscEptFqX6SD/uzO3z9uey+GvQVXZWVd21D0wm+8cEm//7VZWxqnVWtYlfUco/8XZMKlk8rKbBg9R+fE4+DI/CymEs5rXJtISYH5qVo4AcS0iOMVk57PGsLEJ4yh4h/P0cCKlk73z2ysQJaUY13JBLmQNx5FW2j8Sj87bixPktxiTK9cP97/RREMPt2afmSbt0xOEtayJWWTR4WymDfzUB4/j3VhCrhr9VrEUckNjngEQckIgDEnFAIg5IxAGJOCARByTigEQckP4CAveXJz32UzUAAAAASUVORK5CYII=">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Yomogi&family=Noto+Sans+JP:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #f3ecd9;
+    --paper-line: #e4d9bd;
+    --card: #fffdf6;
+    --card-edge: #e9e0c8;
+    --ink: #33302a;
+    --ink-dim: #8a8172;
+    --pencil: #4a5a78;
+    --tape-a: #cfe0e8;
+    --tape-b: #f6dfa8;
+    --shadow: rgba(60, 50, 30, 0.14);
+  }
+  *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+  html, body{ height:100%; overscroll-behavior-y: contain; }
+  body{
+    margin:0;
+    min-height:100dvh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 14px;
+    padding-top: max(14px, env(safe-area-inset-top));
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
+    color: var(--ink);
+    font-family: 'Noto Sans JP', sans-serif;
+    background:
+      repeating-linear-gradient(
+        var(--paper) 0px, var(--paper) 27px,
+        var(--paper-line) 28px
+      );
+    background-color: var(--paper);
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+  }
+  input, textarea{ -webkit-user-select: text; user-select: text; }
+  .hand{ font-family:'Yomogi', cursive; }
+
+  /* ---------- Landing: choose notebook ---------- */
+  #landing{
+    display:none;
+    max-width: 420px;
+    width:100%;
+    text-align:center;
+  }
+  .app-title{
+    font-family:'Yomogi', cursive;
+    font-size: 34px;
+    margin: 0 0 4px;
+    color: var(--ink);
+  }
+  .app-sub{
+    font-size: 12.5px;
+    color: var(--ink-dim);
+    margin: 0 0 32px;
+  }
+  .book-row{
+    display:flex;
+    gap: 18px;
+    justify-content:center;
+    margin-bottom: 26px;
+  }
+  .book{
+    flex:1;
+    height: 150px;
+    border-radius: 6px 10px 10px 6px;
+    cursor:pointer;
+    position:relative;
+    box-shadow: 0 10px 22px var(--shadow);
+    transition: transform .18s ease, box-shadow .18s ease;
+    border:none;
+    padding:0;
+    overflow:hidden;
+  }
+  .book:hover{ transform: translateY(-4px); box-shadow: 0 16px 30px var(--shadow); }
+  .book.a{ background: linear-gradient(160deg, #7f97b8, #566d8f); }
+  .book.b{ background: linear-gradient(160deg, #e0b96e, #c3903f); }
+  .book .spine{
+    position:absolute; left:0; top:0; bottom:0; width:14px;
+    background: rgba(0,0,0,0.18);
+  }
+  .book .label{
+    position:absolute;
+    left: 26px; right: 14px; top: 50%;
+    transform: translateY(-50%);
+    text-align:left;
+    color: #fff;
+    font-family:'Yomogi', cursive;
+    font-size: 18px;
+    text-shadow: 0 1px 2px rgba(0,0,0,.25);
+  }
+  .book .label small{
+    display:block;
+    font-family:'Noto Sans JP', sans-serif;
+    font-size: 11px;
+    opacity: .85;
+    margin-top: 4px;
+    font-weight:400;
+  }
+  .hint{
+    font-size: 11.5px;
+    color: var(--ink-dim);
+    line-height: 1.8;
+  }
+
+  /* ---------- PIN screen ---------- */
+  #pinScreen{
+    display:block;
+    max-width: 340px;
+    width:100%;
+    text-align:center;
+  }
+  #pinScreen .pin-title{
+    font-family:'Yomogi', cursive;
+    font-size: 19px;
+    margin: 0 0 6px;
+  }
+  #pinScreen .pin-sub{
+    font-size: 11.5px;
+    color: var(--ink-dim);
+    margin: 0 0 18px;
+  }
+  #pinInput{
+    width: 170px;
+    text-align:center;
+    letter-spacing: 10px;
+    font-size: 24px;
+    font-family: 'Noto Sans JP', sans-serif;
+    padding: 12px 0 12px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--card-edge);
+    background: var(--card);
+    color: var(--ink);
+    outline:none;
+    margin-bottom: 14px;
+  }
+  #pinInput:focus{ border-color: var(--pencil); }
+  #pinInput.shake{ animation: shake .35s ease; border-color:#c05a4a; }
+  @keyframes shake{
+    0%,100%{ transform: translateX(0); }
+    25%{ transform: translateX(-6px); }
+    75%{ transform: translateX(6px); }
+  }
+  #pinGo{
+    display:block;
+    width: 100%;
+    background: var(--pencil);
+    border:none;
+    color:#fff;
+    font-weight:500;
+    border-radius:10px;
+    padding: 14px 0;
+    cursor:pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size:14.5px;
+    margin-bottom: 12px;
+  }
+  #pinGo:disabled{ opacity:.4; cursor:default; }
+  #pinError{
+    font-size: 11.5px;
+    color: #c05a4a;
+    min-height: 16px;
+    margin-bottom: 8px;
+  }
+
+  /* ---------- Debug panel (5-tap on title) ---------- */
+  #debugPanel{
+    display:none;
+    position: fixed;
+    inset: 0;
+    background: rgba(23,20,15,0.92);
+    color: #f3ecd9;
+    z-index: 999;
+    padding: 24px;
+    padding-top: max(24px, env(safe-area-inset-top));
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+    font-family: 'Noto Sans JP', sans-serif;
+    overflow-y: auto;
+  }
+  #debugPanel .dbg-title{
+    font-family:'Yomogi', cursive;
+    font-size: 20px;
+    margin: 0 0 14px;
+  }
+  #debugPanel .dbg-line{ font-size: 12.5px; margin: 0 0 14px; color:#cfc6b4; }
+  #debugPanel .dbg-line b{ color:#f3ecd9; font-family:'JetBrains Mono', monospace; }
+  #dbgPing{
+    display:block;
+    width:100%;
+    background: var(--ember, #e0b96e);
+    color:#1a1208;
+    border:none;
+    border-radius:10px;
+    padding: 12px 0;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+    margin-bottom: 16px;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+  #dbgLog{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height:1.7;
+    white-space: pre-wrap;
+    word-break: break-all;
+    background: rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 12px;
+    min-height: 120px;
+    margin-bottom: 16px;
+  }
+  #dbgClose{
+    display:block;
+    width:100%;
+    background:none;
+    border: 1px solid #55503f;
+    color:#cfc6b4;
+    border-radius:10px;
+    padding: 10px 0;
+    font-size:13px;
+    cursor:pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
+
+  /* looks like an idle doodle in the margin of the page - it isn't */
+  #wipeDoodle{
+    position: fixed;
+    right: max(22px, env(safe-area-inset-right));
+    bottom: max(22px, env(safe-area-inset-bottom));
+    width: 50px;
+    height: 50px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    opacity: 0.75;
+    transform: rotate(-6deg);
+    transition: transform .15s ease, opacity .15s ease;
+  }
+  #wipeDoodle svg{ width:100%; height:100%; }
+  #wipeDoodle:hover{ opacity: 1; transform: rotate(-6deg) scale(1.06); }
+  #wipeDoodle.zapped{ animation: zap .5s ease; }
+  @keyframes zap{
+    0%{ transform: rotate(-6deg) scale(1); }
+    40%{ transform: rotate(8deg) scale(1.25); }
+    100%{ transform: rotate(-6deg) scale(1); opacity: 0.75; }
+  }
+
+  /* ---------- Notepad screen ---------- */
+  #pad{
+    display:none;
+    flex-direction:column;
+    width:100%;
+    max-width: 460px;
+    height: 92dvh;
+    max-height: 820px;
+    background: var(--card);
+    border-radius: 18px;
+    box-shadow: 0 24px 60px var(--shadow);
+    overflow:hidden;
+    position:relative;
+  }
+  .rings{
+    display:flex;
+    justify-content:space-evenly;
+    padding: 10px 26px 0;
+    background: var(--card);
+  }
+  .rings span{
+    width: 12px; height: 12px;
+    border-radius:50%;
+    background: var(--paper);
+    box-shadow: inset 0 2px 3px rgba(0,0,0,.18);
+  }
+  header.padtop{
+    padding: 6px 22px 14px;
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    border-bottom: 1px solid var(--card-edge);
+  }
+  header.padtop .name{
+    font-family:'Yomogi', cursive;
+    font-size: 20px;
+  }
+  header.padtop .which{
+    font-size: 11px;
+    color: var(--ink-dim);
+  }
+
+  #sheet{
+    flex:1;
+    overflow-y:auto;
+    padding: 18px 20px;
+    display:flex;
+    flex-direction:column;
+    gap: 14px;
+  }
+  #sheet::-webkit-scrollbar{ width:6px; }
+  #sheet::-webkit-scrollbar-thumb{ background: var(--card-edge); border-radius:3px; }
+
+  .empty{
+    margin:auto;
+    text-align:center;
+    color: var(--ink-dim);
+    font-size:12.5px;
+    line-height:1.9;
+  }
+
+  .note{
+    background: var(--card);
+    border: 1px solid var(--card-edge);
+    border-radius: 3px;
+    padding: 12px 14px 10px;
+    font-size: 14.5px;
+    line-height: 1.6;
+    position:relative;
+    box-shadow: 0 3px 8px rgba(60,50,30,0.08);
+    animation: land .22s ease;
+  }
+  @keyframes land{
+    from{ opacity:0; transform: translateY(6px) rotate(0deg); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+  .note.tilt-l{ transform: rotate(-0.6deg); }
+  .note.tilt-r{ transform: rotate(0.6deg); }
+  .note .tape{
+    position:absolute; top:-7px; left: 16px;
+    width: 34px; height: 14px;
+    opacity:.9;
+    transform: rotate(-3deg);
+  }
+  .note.mine .tape{ background: var(--tape-a); }
+  .note.theirs .tape{ background: var(--tape-b); }
+  .note .body{ white-space: pre-wrap; word-break: break-word; }
+  .note .stamp{
+    display:block;
+    margin-top: 6px;
+    font-size: 10px;
+    color: var(--ink-dim);
+    text-align:right;
+  }
+
+  /* signature moment: a read note gets crossed out, then lifted away and gone */
+  .note.consuming .body{
+    text-decoration: line-through;
+    text-decoration-color: var(--pencil);
+    transition: text-decoration-color .3s ease;
+  }
+  .note.tossed{
+    animation: toss .85s ease forwards;
+    pointer-events:none;
+  }
+  @keyframes toss{
+    0%{ opacity:1; transform: translateY(0) rotate(0deg) scale(1); }
+    100%{ opacity:0; transform: translateY(-22px) rotate(6deg) scale(0.85); filter: blur(2px); }
+  }
+
+  form#composer{
+    display:flex;
+    gap: 8px;
+    padding: 12px 14px;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    border-top: 1px solid var(--card-edge);
+    background: var(--card);
+  }
+  #text{
+    flex:1;
+    background: var(--paper);
+    border: 1px solid var(--card-edge);
+    border-radius: 10px;
+    color: var(--ink);
+    padding: 12px 14px;
+    font-size: 16px;
+    font-family: inherit;
+    outline:none;
+    resize:none;
+  }
+  #text:focus{ border-color: var(--pencil); }
+  #addBtn{
+    background: var(--pencil);
+    border:none;
+    color:#fff;
+    font-weight:500;
+    border-radius:10px;
+    padding: 0 20px;
+    cursor:pointer;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size:14px;
+    min-width: 60px;
+  }
+  #addBtn:active{ transform: scale(.97); }
+  #addBtn:disabled{ opacity:.4; cursor:default; }
+</style>
+</head>
+<body>
+
+<div id="landing">
+  <p class="app-title">メモ</p>
+  <p class="app-sub">かんたんメモ帳</p>
+  <div class="book-row">
+    <button class="book a" data-id="A">
+      <span class="spine"></span>
+      <span class="label">ノート A<small>開く</small></span>
+    </button>
+    <button class="book b" data-id="B">
+      <span class="spine"></span>
+      <span class="label">ノート B<small>開く</small></span>
+    </button>
+  </div>
+  <p class="hint">前回のメモは自動で片付けられます。<br>使うノートを選んでください。</p>
+</div>
+
+<div id="pinScreen">
+  <p class="app-title hand" id="pinAppTitle" style="font-size:28px;">メモ帳</p>
+  <p class="pin-title" id="pinTitle">暗証番号</p>
+  <p class="pin-sub" id="pinSub">4桁の番号を入力してください</p>
+  <input id="pinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off">
+  <p id="pinError"></p>
+  <button id="pinGo">開く</button>
+</div>
+
+<button id="wipeDoodle" type="button" aria-label="doodle">
+  <svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
+    <path d="M30 12
+             C 42 12, 49 20, 48 30
+             C 47 41, 38 48, 28 47
+             C 18 46, 11 38, 12 28
+             C 13 17, 22 10, 33 13
+             C 40 15, 44 21, 43 27"
+          fill="none" stroke="#c0524a" stroke-width="2.6"
+          stroke-linecap="round" />
+  </svg>
+</button>
+
+<div id="debugPanel">
+  <p class="dbg-title">通信テスト</p>
+  <p class="dbg-line">この端末のID: <b id="dbgMe"></b></p>
+  <button id="dbgPing" type="button">PINGを送信</button>
+  <div class="dbg-log" id="dbgLog"></div>
+  <button id="dbgClose" type="button">閉じる</button>
+</div>
+
+<div id="pad">
+  <div class="rings"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <header class="padtop">
+    <span class="name">メモ</span>
+    <span class="which" id="whichNote"></span>
+  </header>
+  <div id="sheet">
+    <div class="empty" id="emptyMsg">まだメモはありません。<br>下から書いてみましょう。</div>
+  </div>
+  <form id="composer">
+    <textarea id="text" rows="1" placeholder="ここにメモを書く…" maxlength="1000"></textarea>
+    <button id="addBtn" type="submit">追加</button>
+  </form>
+</div>
+
+<script>
+(function(){
+  const NTFY_TOPIC = 'kienote-dcdfafd16282cfeebab8';
+  const NTFY_BASE = 'https://ntfy.sh/' + NTFY_TOPIC;
+  let myId = null;
+  let otherId = null;
+  const seenIds = new Set();
+  let sinceCursor = '5m'; // on first connect, only catch up on the last 5 minutes
+
+  const landing = document.getElementById('landing');
+  const pinScreen = document.getElementById('pinScreen');
+  const pinTitle = document.getElementById('pinTitle');
+  const pinSub = document.getElementById('pinSub');
+  const pinInput = document.getElementById('pinInput');
+  const pinError = document.getElementById('pinError');
+  const pinGo = document.getElementById('pinGo');
+  const wipeDoodle = document.getElementById('wipeDoodle');
+  const pinAppTitle = document.getElementById('pinAppTitle');
+  const debugPanel = document.getElementById('debugPanel');
+  const dbgMe = document.getElementById('dbgMe');
+  const dbgPing = document.getElementById('dbgPing');
+  const dbgLog = document.getElementById('dbgLog');
+  const dbgClose = document.getElementById('dbgClose');
+  const pad = document.getElementById('pad');
+  const sheet = document.getElementById('sheet');
+  const emptyMsg = document.getElementById('emptyMsg');
+  const whichNote = document.getElementById('whichNote');
+  const composer = document.getElementById('composer');
+  const textEl = document.getElementById('text');
+  const addBtn = document.getElementById('addBtn');
+
+  const APP_PIN = '0718';
+  const NTFY_DEBUG_TOPIC = NTFY_TOPIC + '-debug';
+  const deviceId = Math.random().toString(36).slice(2, 6).toUpperCase();
+  let debugTimer = null;
+  let debugSince = '5m';
+
+  pinInput.focus();
+
+  // --- debug panel: tap the title 5 times to open a cross-device ping test ---
+  let tapCount = 0;
+  let tapTimer = null;
+  pinAppTitle.addEventListener('click', ()=>{
+    tapCount++;
+    clearTimeout(tapTimer);
+    tapTimer = setTimeout(()=>{ tapCount = 0; }, 1500);
+    if(tapCount >= 5){
+      tapCount = 0;
+      openDebugPanel();
+    }
+  });
+
+  function openDebugPanel(){
+    dbgMe.textContent = deviceId;
+    debugPanel.style.display = 'block';
+    refreshDebugLog();
+    debugTimer = setInterval(refreshDebugLog, 1000);
+  }
+
+  function closeDebugPanel(){
+    debugPanel.style.display = 'none';
+    clearInterval(debugTimer);
+  }
+
+  dbgClose.addEventListener('click', closeDebugPanel);
+
+  dbgPing.addEventListener('click', async ()=>{
+    const payload = { from: deviceId, ts: Date.now() };
+    try{
+      await fetch('https://ntfy.sh/' + NTFY_DEBUG_TOPIC, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      });
+      dbgLog.textContent = '送信しました:\n' + JSON.stringify(payload, null, 2) + '\n\n(反映まで数秒、下の欄が自動更新されます)';
+    }catch(e){
+      dbgLog.textContent = '送信エラー: ネットワークに問題がある可能性があります。\n' + String(e);
+    }
+  });
+
+  async function refreshDebugLog(){
+    let text;
+    try{
+      const res = await fetch('https://ntfy.sh/' + NTFY_DEBUG_TOPIC + '/json?poll=1&since=' + encodeURIComponent(debugSince));
+      text = await res.text();
+    }catch(e){
+      dbgLog.textContent = '読み込みエラー: ntfy.sh に接続できません。\nこの端末のネット接続を確認してください。\n\n' + String(e);
+      return;
+    }
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    let latest = null;
+    lines.forEach(line=>{
+      let evt;
+      try{ evt = JSON.parse(line); }catch(e){ return; }
+      if(evt.event !== 'message') return;
+      debugSince = evt.id;
+      try{ latest = JSON.parse(evt.message); }catch(e){ /* ignore */ }
+    });
+    const now = new Date().toLocaleTimeString('ja-JP');
+    if(latest){
+      const age = Math.round((Date.now() - latest.ts) / 1000);
+      dbgLog.textContent =
+        '受信しました:\n' + JSON.stringify(latest, null, 2) +
+        '\n\n受信からの経過: ' + age + '秒前' +
+        '\n(最終確認: ' + now + ')';
+    }else if(!dbgLog.textContent || dbgLog.textContent.indexOf('送信しました') === -1){
+      dbgLog.textContent = '受信データなし\n(最終確認: ' + now + ')\n\nもう一方の端末でも同じ画面を開き「PINGを送信」を押してみてください。';
+    }
+  }
+
+  function trySubmitPin(){
+    const val = pinInput.value.trim();
+    if(!/^\d{4}$/.test(val)){
+      showPinError('4桁の数字を入力してください');
+      return;
+    }
+    if(val === APP_PIN){
+      unlockLanding();
+    }else{
+      showPinError('番号が違います');
+      pinInput.value = '';
+      pinInput.classList.remove('shake');
+      void pinInput.offsetWidth;
+      pinInput.classList.add('shake');
+    }
+  }
+
+  function showPinError(msg){
+    pinError.textContent = msg;
+  }
+
+  pinGo.addEventListener('click', trySubmitPin);
+  pinInput.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter') trySubmitPin();
+  });
+
+  // looks like a doodle, actually skips past anything currently pending
+  // (ntfy.sh has no bulk-delete API for a third party, so this advances our
+  // cursor to "now" - any note published before this moment will never be shown)
+  wipeDoodle.addEventListener('click', (e)=>{
+    e.preventDefault();
+    wipeDoodle.classList.remove('zapped');
+    void wipeDoodle.offsetWidth;
+    wipeDoodle.classList.add('zapped');
+    sinceCursor = Math.floor(Date.now() / 1000).toString();
+  });
+
+  function unlockLanding(){
+    pinScreen.style.display = 'none';
+    landing.style.display = 'block';
+  }
+
+  document.querySelectorAll('.book').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      enterNotebook(btn.dataset.id);
+    });
+  });
+
+  function enterNotebook(id){
+    myId = id;
+    otherId = myId === 'A' ? 'B' : 'A';
+    whichNote.textContent = 'ノート ' + myId;
+    landing.style.display = 'none';
+    pad.style.display = 'flex';
+    startPolling();
+    textEl.focus();
+  }
+
+  function timeStr(ts){
+    const d = new Date(ts);
+    return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+  }
+
+  function addNote({text, ts, mine}){
+    emptyMsg.style.display = 'none';
+    const el = document.createElement('div');
+    const tilt = Math.random() > 0.5 ? 'tilt-l' : 'tilt-r';
+    el.className = 'note ' + (mine ? 'mine' : 'theirs') + ' ' + tilt;
+    el.innerHTML = '<span class="tape"></span>';
+    const body = document.createElement('div');
+    body.className = 'body';
+    body.textContent = text;
+    el.appendChild(body);
+    const stamp = document.createElement('span');
+    stamp.className = 'stamp';
+    stamp.textContent = timeStr(ts);
+    el.appendChild(stamp);
+    sheet.appendChild(el);
+    sheet.scrollTop = sheet.scrollHeight;
+    return el;
+  }
+
+  // longer notes stay on screen longer before they're crossed out and cleared
+  function readDelay(text){
+    const CHAR_MS = 90;   // rough reading pace per character
+    const MIN_MS = 1800;  // floor, so even one word doesn't flash
+    const MAX_MS = 15000; // ceiling, so a max-length note doesn't sit forever
+    return Math.min(MAX_MS, Math.max(MIN_MS, text.length * CHAR_MS));
+  }
+
+  function consumeNote(el, text){
+    setTimeout(()=>{
+      el.classList.add('consuming');
+      setTimeout(()=>{
+        el.classList.add('tossed');
+        setTimeout(()=> el.remove(), 900);
+      }, 500);
+    }, readDelay(text));
+  }
+
+  function genId(){
+    return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8);
+  }
+
+  // publish one note to the shared ntfy topic (acts as our mailbox)
+  async function publishNote(note){
+    try{
+      await fetch(NTFY_BASE, {
+        method: 'POST',
+        body: JSON.stringify(note)
+      });
+    }catch(e){
+      console.error('publish failed', e);
+    }
+  }
+
+  // pull anything new since our cursor; returns parsed note envelopes
+  async function pollNotes(){
+    let text;
+    try{
+      const res = await fetch(NTFY_BASE + '/json?poll=1&since=' + encodeURIComponent(sinceCursor));
+      text = await res.text();
+    }catch(e){
+      console.error('poll failed', e);
+      return [];
+    }
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    const notes = [];
+    lines.forEach(line=>{
+      let evt;
+      try{ evt = JSON.parse(line); }catch(e){ return; }
+      if(evt.event !== 'message') return;
+      sinceCursor = evt.id; // advance cursor so next poll only gets newer items
+      try{
+        const note = JSON.parse(evt.message);
+        if(note && note.id && note.sender && typeof note.text === 'string'){
+          notes.push(note);
+        }
+      }catch(e){ /* not one of our notes, ignore */ }
+    });
+    return notes;
+  }
+
+  async function addAndShare(text){
+    const ts = Date.now();
+    const note = { id: genId(), sender: myId, text, ts };
+    addNote({ text, ts, mine: true });
+    seenIds.add(note.id);
+    await publishNote(note);
+  }
+
+  async function poll(){
+    const notes = await pollNotes();
+    notes.forEach(n=>{
+      if(n.sender === otherId && !seenIds.has(n.id)){
+        seenIds.add(n.id);
+        const el = addNote({ text: n.text, ts: n.ts, mine: false });
+        consumeNote(el, n.text);
+      }
+    });
+  }
+
+  function startPolling(){
+    poll();
+    setInterval(poll, 1500);
+  }
+
+  composer.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const text = textEl.value.trim();
+    if(!text) return;
+    addBtn.disabled = true;
+    addAndShare(text).finally(()=>{ addBtn.disabled = false; });
+    textEl.value = '';
+    textEl.style.height = 'auto';
+  });
+
+  textEl.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' && !e.shiftKey){
+      e.preventDefault();
+      composer.requestSubmit();
+    }
+  });
+
+  textEl.addEventListener('input', ()=>{
+    textEl.style.height = 'auto';
+    textEl.style.height = Math.min(textEl.scrollHeight, 120) + 'px';
+  });
+})();
+</script>
+</body>
+</html>
