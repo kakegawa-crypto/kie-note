@@ -496,7 +496,7 @@
   let myId = null;
   let otherId = null;
   const seenIds = new Set();
-  let sinceCursor = '5m'; // on first connect, only catch up on the last 5 minutes
+  let entrySince = null; // set by the wipe doodle to skip anything published before "now"
 
   const landing = document.getElementById('landing');
   const pinScreen = document.getElementById('pinScreen');
@@ -523,8 +523,7 @@
   const APP_PIN = '0718';
   const NTFY_DEBUG_TOPIC = NTFY_TOPIC + '-debug';
   const deviceId = Math.random().toString(36).slice(2, 6).toUpperCase();
-  let debugTimer = null;
-  let debugSince = '5m';
+  let debugEventSource = null;
 
   pinInput.focus();
 
@@ -544,13 +543,38 @@
   function openDebugPanel(){
     dbgMe.textContent = deviceId;
     debugPanel.style.display = 'block';
-    refreshDebugLog();
-    debugTimer = setInterval(refreshDebugLog, 1000);
+    dbgLog.textContent = '接続中…';
+
+    debugEventSource = new EventSource('https://ntfy.sh/' + NTFY_DEBUG_TOPIC + '/sse');
+    debugEventSource.onopen = ()=>{
+      if(dbgLog.textContent === '接続中…'){
+        dbgLog.textContent = '接続できました。もう一方の端末でも同じ画面を開き「PINGを送信」を押してみてください。';
+      }
+    };
+    debugEventSource.onmessage = (e)=>{
+      let evt;
+      try{ evt = JSON.parse(e.data); }catch(err){ return; }
+      let latest;
+      try{ latest = JSON.parse(evt.message); }catch(err){ return; }
+      if(!latest || !latest.from) return;
+      const now = new Date().toLocaleTimeString('ja-JP');
+      const age = Math.round((Date.now() - latest.ts) / 1000);
+      dbgLog.textContent =
+        '受信しました:\n' + JSON.stringify(latest, null, 2) +
+        '\n\n受信からの経過: ' + age + '秒前' +
+        '\n(最終確認: ' + now + ')';
+    };
+    debugEventSource.onerror = ()=>{
+      dbgLog.textContent = '接続エラー: ntfy.sh に接続できません。\nこの端末のネット接続を確認してください。';
+    };
   }
 
   function closeDebugPanel(){
     debugPanel.style.display = 'none';
-    clearInterval(debugTimer);
+    if(debugEventSource){
+      debugEventSource.close();
+      debugEventSource = null;
+    }
   }
 
   dbgClose.addEventListener('click', closeDebugPanel);
@@ -564,7 +588,7 @@
         method: 'POST',
         body: JSON.stringify(payload)
       });
-      dbgLog.textContent = '送信しました:\n' + JSON.stringify(payload, null, 2) + '\n\n(反映まで数秒、下の欄が自動更新されます)';
+      dbgLog.textContent = '送信しました:\n' + JSON.stringify(payload, null, 2) + '\n\n(反映まで数秒、受信すれば自動で表示が変わります)';
     }catch(e){
       const isAbort = e && e.name === 'AbortError';
       dbgLog.textContent = (isAbort ? '送信タイムアウト（8秒応答なし）' : '送信エラー: ネットワークに問題がある可能性があります。') + '\n' + String(e);
@@ -572,37 +596,6 @@
       dbgPing.disabled = false;
     }
   });
-
-  async function refreshDebugLog(){
-    let text;
-    try{
-      const res = await fetchTimeout('https://ntfy.sh/' + NTFY_DEBUG_TOPIC + '/json?poll=1&since=' + encodeURIComponent(debugSince));
-      text = await res.text();
-    }catch(e){
-      const isAbort = e && e.name === 'AbortError';
-      dbgLog.textContent = (isAbort ? '読み込みタイムアウト（8秒応答なし）' : '読み込みエラー: ntfy.sh に接続できません。\nこの端末のネット接続を確認してください。') + '\n' + String(e);
-      return;
-    }
-    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-    let latest = null;
-    lines.forEach(line=>{
-      let evt;
-      try{ evt = JSON.parse(line); }catch(e){ return; }
-      if(evt.event !== 'message') return;
-      debugSince = evt.id;
-      try{ latest = JSON.parse(evt.message); }catch(e){ /* ignore */ }
-    });
-    const now = new Date().toLocaleTimeString('ja-JP');
-    if(latest){
-      const age = Math.round((Date.now() - latest.ts) / 1000);
-      dbgLog.textContent =
-        '受信しました:\n' + JSON.stringify(latest, null, 2) +
-        '\n\n受信からの経過: ' + age + '秒前' +
-        '\n(最終確認: ' + now + ')';
-    }else if(!dbgLog.textContent || dbgLog.textContent.indexOf('送信しました') === -1){
-      dbgLog.textContent = '受信データなし\n(最終確認: ' + now + ')\n\nもう一方の端末でも同じ画面を開き「PINGを送信」を押してみてください。';
-    }
-  }
 
   function trySubmitPin(){
     const val = pinInput.value.trim();
@@ -631,14 +624,15 @@
   });
 
   // looks like a doodle, actually skips past anything currently pending
-  // (ntfy.sh has no bulk-delete API for a third party, so this advances our
-  // cursor to "now" - any note published before this moment will never be shown)
+  // (ntfy.sh has no bulk-delete API for a third party, so this makes the next
+  // notebook connection start "now" - anything published before this moment
+  // will never be delivered to this device)
   wipeDoodle.addEventListener('click', (e)=>{
     e.preventDefault();
     wipeDoodle.classList.remove('zapped');
     void wipeDoodle.offsetWidth;
     wipeDoodle.classList.add('zapped');
-    sinceCursor = Math.floor(Date.now() / 1000).toString();
+    entrySince = Math.floor(Date.now() / 1000).toString();
   });
 
   function unlockLanding(){
@@ -720,33 +714,6 @@
     }
   }
 
-  // pull anything new since our cursor; returns parsed note envelopes
-  async function pollNotes(){
-    let text;
-    try{
-      const res = await fetchTimeout(NTFY_BASE + '/json?poll=1&since=' + encodeURIComponent(sinceCursor));
-      text = await res.text();
-    }catch(e){
-      console.error('poll failed', e);
-      return [];
-    }
-    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
-    const notes = [];
-    lines.forEach(line=>{
-      let evt;
-      try{ evt = JSON.parse(line); }catch(e){ return; }
-      if(evt.event !== 'message') return;
-      sinceCursor = evt.id; // advance cursor so next poll only gets newer items
-      try{
-        const note = JSON.parse(evt.message);
-        if(note && note.id && note.sender && typeof note.text === 'string'){
-          notes.push(note);
-        }
-      }catch(e){ /* not one of our notes, ignore */ }
-    });
-    return notes;
-  }
-
   async function addAndShare(text){
     const ts = Date.now();
     const note = { id: genId(), sender: myId, text, ts };
@@ -755,20 +722,26 @@
     await publishNote(note);
   }
 
-  async function poll(){
-    const notes = await pollNotes();
-    notes.forEach(n=>{
+  let mainEventSource = null;
+
+  function startPolling(){
+    const url = NTFY_BASE + '/sse' + (entrySince ? ('?since=' + encodeURIComponent(entrySince)) : '');
+    mainEventSource = new EventSource(url);
+    mainEventSource.onmessage = (e)=>{
+      let evt;
+      try{ evt = JSON.parse(e.data); }catch(err){ return; }
+      let n;
+      try{ n = JSON.parse(evt.message); }catch(err){ return; }
+      if(!n || !n.id || !n.sender || typeof n.text !== 'string') return;
       if(n.sender === otherId && !seenIds.has(n.id)){
         seenIds.add(n.id);
         const el = addNote({ text: n.text, ts: n.ts, mine: false });
         consumeNote(el, n.text);
       }
-    });
-  }
-
-  function startPolling(){
-    poll();
-    setInterval(poll, 1500);
+    };
+    mainEventSource.onerror = ()=>{
+      // the browser retries automatically; nothing else to do here
+    };
   }
 
   composer.addEventListener('submit', (e)=>{
