@@ -421,11 +421,11 @@
   <div class="book-row">
     <button class="book a" data-id="A">
       <span class="spine"></span>
-      <span class="label">ノート A<small>開く</small></span>
+      <span class="label">仕事<small>開く</small></span>
     </button>
     <button class="book b" data-id="B">
       <span class="spine"></span>
-      <span class="label">ノート B<small>開く</small></span>
+      <span class="label">プライベート<small>開く</small></span>
     </button>
   </div>
   <p class="hint">前回のメモは自動で片付けられます。<br>使うノートを選んでください。</p>
@@ -669,7 +669,7 @@
   function enterNotebook(id){
     myId = id;
     otherId = myId === 'A' ? 'B' : 'A';
-    whichNote.textContent = 'ノート ' + myId;
+    whichNote.textContent = (myId === 'A' ? '仕事' : 'プライベート');
     landing.style.display = 'none';
     pad.style.display = 'flex';
     startPolling();
@@ -700,13 +700,7 @@
     return el;
   }
 
-  // longer notes stay on screen longer before they're crossed out and cleared
-  function readDelay(text){
-    const CHAR_MS = 45;   // rough reading pace per character
-    const MIN_MS = 900;   // floor, so even one word doesn't flash
-    const MAX_MS = 7000;  // ceiling, so a max-length note doesn't sit forever
-    return Math.min(MAX_MS, Math.max(MIN_MS, text.length * CHAR_MS));
-  }
+  const DISPLAY_MS = 5000; // both received and sent notes stay for a fixed 5 seconds
 
   function isForeground(){
     return document.visibilityState === 'visible' && document.hasFocus();
@@ -721,7 +715,7 @@
   }
 
   function consumeNote(el, text){
-    const start = ()=> setTimeout(()=> crossOutAndRemove(el), readDelay(text));
+    const start = ()=> setTimeout(()=> crossOutAndRemove(el), DISPLAY_MS);
 
     if(isForeground()){
       start();
@@ -740,11 +734,10 @@
     window.addEventListener('focus', onForeground);
   }
 
-  // the sender's own copy self-destructs on a fixed clock, independent of
-  // whether the other side has read it yet
-  const SELF_DESTRUCT_MS = 30000;
+  // the sender's own copy self-destructs on the same fixed clock, independent
+  // of whether the other side has read it yet
   function selfDestruct(el){
-    setTimeout(()=> crossOutAndRemove(el), SELF_DESTRUCT_MS);
+    setTimeout(()=> crossOutAndRemove(el), DISPLAY_MS);
   }
 
   function genId(){
