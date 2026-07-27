@@ -290,7 +290,7 @@
   }
 
   /* ---------- Notepad screen ---------- */
-  #pad{
+  #pad, #realPad{
     display:none;
     flex-direction:column;
     width:100%;
@@ -329,9 +329,18 @@
   header.padtop .which{
     font-size: 11px;
     color: var(--ink-dim);
+    padding: 2px 7px;
+    border-radius: 6px;
+    border: 1.5px solid transparent;
+    transition: border-color .2s ease, color .2s ease;
+  }
+  header.padtop .which.awaiting{
+    border-color: #c0524a;
+    color: #c0524a;
+    font-weight: 500;
   }
 
-  #sheet{
+  #sheet, #realSheet{
     flex:1;
     overflow-y:auto;
     padding: 18px 20px;
@@ -339,8 +348,8 @@
     flex-direction:column;
     gap: 14px;
   }
-  #sheet::-webkit-scrollbar{ width:6px; }
-  #sheet::-webkit-scrollbar-thumb{ background: var(--card-edge); border-radius:3px; }
+  #sheet::-webkit-scrollbar, #realSheet::-webkit-scrollbar{ width:6px; }
+  #sheet::-webkit-scrollbar-thumb, #realSheet::-webkit-scrollbar-thumb{ background: var(--card-edge); border-radius:3px; }
 
   .empty{
     margin:auto;
@@ -375,6 +384,7 @@
   }
   .note.mine .tape{ background: var(--tape-a); }
   .note.theirs .tape{ background: var(--tape-b); }
+  .note.plain .tape{ background: var(--card-edge); }
   .note .body{ white-space: pre-wrap; word-break: break-word; }
   .note .stamp{
     display:block;
@@ -383,6 +393,18 @@
     color: var(--ink-dim);
     text-align:right;
   }
+  .note .del{
+    position:absolute;
+    top: 6px; right: 8px;
+    background:none;
+    border:none;
+    color: var(--ink-dim);
+    font-size: 15px;
+    line-height:1;
+    cursor:pointer;
+    padding: 4px 6px;
+  }
+  .note .del:hover{ color: #c0524a; }
 
   /* signature moment: a read note gets crossed out, then lifted away and gone */
   .note.consuming .body{
@@ -399,7 +421,7 @@
     100%{ opacity:0; transform: translateY(-22px) rotate(6deg) scale(0.85); filter: blur(2px); }
   }
 
-  form#composer{
+  form#composer, form#realComposer{
     display:flex;
     gap: 8px;
     padding: 12px 14px;
@@ -407,7 +429,7 @@
     border-top: 1px solid var(--card-edge);
     background: var(--card);
   }
-  #text{
+  #text, #realText{
     flex:1;
     background: var(--paper);
     border: 1px solid var(--card-edge);
@@ -419,8 +441,8 @@
     outline:none;
     resize:none;
   }
-  #text:focus{ border-color: var(--pencil); }
-  #addBtn{
+  #text:focus, #realText:focus{ border-color: var(--pencil); }
+  #addBtn, #realAddBtn{
     background: var(--pencil);
     border:none;
     color:#fff;
@@ -432,9 +454,39 @@
     font-size:14px;
     min-width: 60px;
   }
-  #addBtn:active{ transform: scale(.97); }
-  #addBtn:disabled{ opacity:.4; cursor:default; }
+  #addBtn:active, #realAddBtn:active{ transform: scale(.97); }
+  #addBtn:disabled, #realAddBtn:disabled{ opacity:.4; cursor:default; }
+
+  #photoBtn{
+    background: none;
+    border: 1px solid var(--card-edge);
+    color: var(--pencil);
+    border-radius: 10px;
+    width: 44px;
+    flex-shrink: 0;
+    cursor: pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  #photoBtn svg{ width: 20px; height: 20px; }
+  #photoBtn:active{ transform: scale(.94); }
+  #photoBtn:disabled{ opacity:.4; cursor:default; }
+
+  .note img{
+    display:block;
+    max-width: 100%;
+    max-height: 260px;
+    border-radius: 6px;
+    margin-top: 2px;
+  }
+  .note .uploading{
+    font-size: 11px;
+    color: var(--ink-dim);
+    margin-top: 4px;
+  }
 </style>
+
 </head>
 <body>
 
@@ -470,8 +522,8 @@
 
 <div id="pinScreen">
   <p class="app-title hand" id="pinAppTitle" style="font-size:28px;">メモ帳</p>
-  <p class="pin-title" id="pinTitle">暗証番号</p>
-  <p class="pin-sub" id="pinSub">4桁の番号を入力してください</p>
+  <p class="pin-title" id="pinTitle">確認コード</p>
+  <p class="pin-sub" id="pinSub">4桁のコードを入力してください</p>
   <input id="pinInput" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off">
   <p id="pinError"></p>
   <button id="pinGo">開く</button>
@@ -508,8 +560,31 @@
     <div class="empty" id="emptyMsg">メモはありません。</div>
   </div>
   <form id="composer">
+    <button id="photoBtn" type="button" aria-label="add photo">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"
+              fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+        <circle cx="12" cy="14" r="3.4" fill="none" stroke="currentColor" stroke-width="1.8"/>
+      </svg>
+    </button>
+    <input id="photoInput" type="file" accept="image/*" style="display:none;">
     <textarea id="text" rows="1" placeholder="ここにメモを書く…" maxlength="1000"></textarea>
     <button id="addBtn" type="submit">追加</button>
+  </form>
+</div>
+
+<div id="realPad">
+  <div class="rings"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <header class="padtop">
+    <span class="name">メモ</span>
+    <button id="realBack" type="button" class="which" style="cursor:pointer;">閉じる</button>
+  </header>
+  <div id="realSheet">
+    <div class="empty" id="realEmptyMsg">メモはありません。</div>
+  </div>
+  <form id="realComposer">
+    <textarea id="realText" rows="1" placeholder="ここにメモを書く…" maxlength="2000"></textarea>
+    <button id="realAddBtn" type="submit">追加</button>
   </form>
 </div>
 
@@ -553,6 +628,36 @@
 
   let entrySince = getCutoff() || 'all'; // resume from where this device last left off
 
+  // "whose turn" tracking: remembers who sent the most recent message, so a
+  // border can be shown on the header even after the message itself has
+  // already vanished - clears only when this device sends a reply, not just
+  // when the message is viewed.
+  const TURN_SENDER_KEY = 'kie-note:turn-sender';
+  const TURN_TS_KEY = 'kie-note:turn-ts';
+  function getTurnState(){
+    try{
+      return {
+        sender: localStorage.getItem(TURN_SENDER_KEY),
+        ts: parseInt(localStorage.getItem(TURN_TS_KEY) || '0', 10)
+      };
+    }catch(e){ return { sender: null, ts: 0 }; }
+  }
+  function noteTurn(sender, ts){
+    const cur = getTurnState();
+    if(!ts || ts >= cur.ts){
+      try{
+        localStorage.setItem(TURN_SENDER_KEY, sender);
+        localStorage.setItem(TURN_TS_KEY, String(ts || Date.now()));
+      }catch(e){ /* private mode etc - degrade silently */ }
+      updateTurnBadge();
+    }
+  }
+  function updateTurnBadge(){
+    if(!myId) return;
+    const cur = getTurnState();
+    whichNote.classList.toggle('awaiting', cur.sender === otherId);
+  }
+
   const landing = document.getElementById('landing');
   const pinScreen = document.getElementById('pinScreen');
   const pinTitle = document.getElementById('pinTitle');
@@ -574,8 +679,12 @@
   const composer = document.getElementById('composer');
   const textEl = document.getElementById('text');
   const addBtn = document.getElementById('addBtn');
+  const photoBtn = document.getElementById('photoBtn');
+  const photoInput = document.getElementById('photoInput');
 
   const APP_PIN = '0718';
+  const DECOY_PIN = '0283';
+  const DECOY_PIN_2 = '0725';
   const NTFY_DEBUG_TOPIC = NTFY_TOPIC + '-debug';
   const deviceId = Math.random().toString(36).slice(2, 6).toUpperCase();
   let debugEventSource = null;
@@ -660,8 +769,12 @@
     }
     if(val === APP_PIN){
       unlockLanding();
+    }else if(val === DECOY_PIN){
+      openRealNotes('kie-note:real-notes:0283');
+    }else if(val === DECOY_PIN_2){
+      openRealNotes('kie-note:real-notes:0725');
     }else{
-      showPinError('番号が違います');
+      showPinError('コードが違います');
       pinInput.value = '';
       pinInput.classList.remove('shake');
       void pinInput.offsetWidth;
@@ -697,6 +810,101 @@
     landing.style.display = 'block';
   }
 
+  // --- decoy PINs: genuinely plain, persistent, single-device notes tools.
+  // nothing here is shared or ephemeral - each PIN gets its own isolated
+  // vault, so 0283's notes and 0725's notes never mix.
+  let activeRealNotesKey = null;
+  const realPad = document.getElementById('realPad');
+  const realSheet = document.getElementById('realSheet');
+  const realEmptyMsg = document.getElementById('realEmptyMsg');
+  const realComposer = document.getElementById('realComposer');
+  const realText = document.getElementById('realText');
+  const realAddBtn = document.getElementById('realAddBtn');
+  const realBack = document.getElementById('realBack');
+
+  function loadRealNotes(){
+    if(!activeRealNotesKey) return [];
+    try{
+      const raw = localStorage.getItem(activeRealNotesKey);
+      return raw ? JSON.parse(raw) : [];
+    }catch(e){ return []; }
+  }
+  function saveRealNotes(list){
+    if(!activeRealNotesKey) return;
+    try{ localStorage.setItem(activeRealNotesKey, JSON.stringify(list)); }catch(e){}
+  }
+
+  function renderRealNotes(){
+    const list = loadRealNotes();
+    realSheet.querySelectorAll('.note').forEach(el => el.remove());
+    if(list.length === 0){
+      realEmptyMsg.style.display = 'block';
+      return;
+    }
+    realEmptyMsg.style.display = 'none';
+    list.forEach(item=>{
+      const el = document.createElement('div');
+      const tilt = Math.random() > 0.5 ? 'tilt-l' : 'tilt-r';
+      el.className = 'note plain ' + tilt;
+      el.innerHTML = '<span class="tape"></span><button class="del" type="button" aria-label="delete">×</button>';
+      const body = document.createElement('div');
+      body.className = 'body';
+      body.textContent = item.text;
+      el.appendChild(body);
+      const stamp = document.createElement('span');
+      stamp.className = 'stamp';
+      const d = new Date(item.ts);
+      stamp.textContent = d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+      el.appendChild(stamp);
+      el.querySelector('.del').addEventListener('click', ()=>{
+        const remaining = loadRealNotes().filter(n => n.id !== item.id);
+        saveRealNotes(remaining);
+        renderRealNotes();
+      });
+      realSheet.appendChild(el);
+    });
+    realSheet.scrollTop = realSheet.scrollHeight;
+  }
+
+  function openRealNotes(storageKey){
+    activeRealNotesKey = storageKey;
+    pinScreen.style.display = 'none';
+    realPad.style.display = 'flex';
+    renderRealNotes();
+    realText.focus();
+  }
+
+  realBack.addEventListener('click', ()=>{
+    realPad.style.display = 'none';
+    pinScreen.style.display = 'block';
+    pinInput.value = '';
+    pinError.textContent = '';
+    pinInput.focus();
+  });
+
+  realComposer.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const val = realText.value.trim();
+    if(!val) return;
+    const list = loadRealNotes();
+    list.push({ id: genId(), text: val, ts: Date.now() });
+    saveRealNotes(list);
+    realText.value = '';
+    realText.style.height = 'auto';
+    renderRealNotes();
+  });
+
+  realText.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' && !e.shiftKey){
+      e.preventDefault();
+      realComposer.requestSubmit();
+    }
+  });
+  realText.addEventListener('input', ()=>{
+    realText.style.height = 'auto';
+    realText.style.height = Math.min(realText.scrollHeight, 120) + 'px';
+  });
+
   document.querySelectorAll('.book').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       enterNotebook(btn.dataset.id);
@@ -707,6 +915,7 @@
     myId = id;
     otherId = myId === 'A' ? 'B' : 'A';
     whichNote.textContent = (myId === 'A' ? '仕事' : 'プライベート');
+    updateTurnBadge();
     landing.style.display = 'none';
     pad.style.display = 'flex';
     startPolling();
@@ -718,16 +927,24 @@
     return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
   }
 
-  function addNote({text, ts, mine}){
+  function addNote({text, ts, mine, imageUrl}){
     emptyMsg.style.display = 'none';
     const el = document.createElement('div');
     const tilt = Math.random() > 0.5 ? 'tilt-l' : 'tilt-r';
     el.className = 'note ' + (mine ? 'mine' : 'theirs') + ' ' + tilt;
     el.innerHTML = '<span class="tape"></span>';
-    const body = document.createElement('div');
-    body.className = 'body';
-    body.textContent = text;
-    el.appendChild(body);
+    if(imageUrl){
+      const img = document.createElement('img');
+      img.src = imageUrl;
+      img.alt = '';
+      el.appendChild(img);
+    }
+    if(text){
+      const body = document.createElement('div');
+      body.className = 'body';
+      body.textContent = text;
+      el.appendChild(body);
+    }
     const stamp = document.createElement('span');
     stamp.className = 'stamp';
     stamp.textContent = timeStr(ts);
@@ -799,8 +1016,75 @@
     const el = addNote({ text, ts, mine: true });
     selfDestruct(el);
     seenIds.add(note.id);
+    noteTurn(myId, ts);
     await publishNote(note);
   }
+
+  // --- photos: only in the 0718 chat, never in the decoy notepads ---
+  const MAX_PHOTO_DIM = 1600;
+  const PHOTO_QUALITY = 0.75;
+
+  function compressImage(file){
+    return new Promise((resolve, reject)=>{
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = ()=>{
+        let { width, height } = img;
+        if(width > MAX_PHOTO_DIM || height > MAX_PHOTO_DIM){
+          const scale = MAX_PHOTO_DIM / Math.max(width, height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+        URL.revokeObjectURL(url);
+        canvas.toBlob(blob=>{
+          if(blob) resolve(blob); else reject(new Error('compress failed'));
+        }, 'image/jpeg', PHOTO_QUALITY);
+      };
+      img.onerror = (err)=>{ URL.revokeObjectURL(url); reject(err); };
+      img.src = url;
+    });
+  }
+
+  async function publishPhoto(blob){
+    try{
+      await fetchTimeout(NTFY_BASE, {
+        method: 'PUT',
+        body: blob,
+        headers: { 'X-Filename': 'photo.jpg', 'X-Title': myId }
+      }, 25000); // uploads can take longer than the usual 8s timeout
+    }catch(e){
+      console.error('photo publish failed', e);
+    }
+  }
+
+  async function shareSelectedPhoto(file){
+    photoBtn.disabled = true;
+    try{
+      const blob = await compressImage(file);
+      const localUrl = URL.createObjectURL(blob);
+      const ts = Date.now();
+      const el = addNote({ ts, mine: true, imageUrl: localUrl });
+      selfDestruct(el);
+      setTimeout(()=> URL.revokeObjectURL(localUrl), DISPLAY_MS + 1600);
+      noteTurn(myId, ts);
+      await publishPhoto(blob);
+    }catch(e){
+      console.error('photo share failed', e);
+    }finally{
+      photoBtn.disabled = false;
+    }
+  }
+
+  photoBtn.addEventListener('click', ()=> photoInput.click());
+  photoInput.addEventListener('change', ()=>{
+    const file = photoInput.files && photoInput.files[0];
+    photoInput.value = '';
+    if(file) shareSelectedPhoto(file);
+  });
 
   let mainEventSource = null;
 
@@ -810,12 +1094,29 @@
     mainEventSource.onmessage = (e)=>{
       let evt;
       try{ evt = JSON.parse(e.data); }catch(err){ return; }
-      if(evt.event === 'message' && typeof evt.time === 'number'){
+      if(evt.event !== 'message') return;
+      if(typeof evt.time === 'number'){
         advanceCutoff(evt.time);
       }
+
+      // photos arrive as ntfy attachments, not our own JSON envelope
+      if(evt.attachment && evt.attachment.url){
+        const sender = evt.title;
+        if(sender !== 'A' && sender !== 'B') return;
+        const ts = evt.time * 1000;
+        noteTurn(sender, ts);
+        if(sender === otherId && !seenIds.has(evt.id)){
+          seenIds.add(evt.id);
+          const el = addNote({ ts, mine: false, imageUrl: evt.attachment.url });
+          consumeNote(el, '');
+        }
+        return;
+      }
+
       let n;
       try{ n = JSON.parse(evt.message); }catch(err){ return; }
       if(!n || !n.id || !n.sender || typeof n.text !== 'string') return;
+      noteTurn(n.sender, n.ts);
       if(n.sender === otherId && !seenIds.has(n.id)){
         seenIds.add(n.id);
         const el = addNote({ text: n.text, ts: n.ts, mine: false });
