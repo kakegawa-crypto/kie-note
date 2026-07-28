@@ -1051,11 +1051,15 @@
 
   async function publishPhoto(blob){
     try{
-      await fetchTimeout(NTFY_BASE, {
+      const res = await fetchTimeout(NTFY_BASE, {
         method: 'PUT',
         body: blob,
         headers: { 'X-Filename': 'photo.jpg', 'X-Title': myId }
       }, 25000); // uploads can take longer than the usual 8s timeout
+      try{
+        const body = await res.json();
+        if(body && body.id) seenIds.add(body.id);
+      }catch(err){ /* response wasn't JSON - fine, just can't pre-dedupe this one */ }
     }catch(e){
       console.error('photo publish failed', e);
     }
@@ -1095,9 +1099,6 @@
       let evt;
       try{ evt = JSON.parse(e.data); }catch(err){ return; }
       if(evt.event !== 'message') return;
-      if(typeof evt.time === 'number'){
-        advanceCutoff(evt.time);
-      }
 
       // photos arrive as ntfy attachments, not our own JSON envelope
       if(evt.attachment && evt.attachment.url){
@@ -1105,9 +1106,9 @@
         if(sender !== 'A' && sender !== 'B') return;
         const ts = evt.time * 1000;
         noteTurn(sender, ts);
-        if(sender === otherId && !seenIds.has(evt.id)){
+        if(!seenIds.has(evt.id)){
           seenIds.add(evt.id);
-          const el = addNote({ ts, mine: false, imageUrl: evt.attachment.url });
+          const el = addNote({ ts, mine: sender === myId, imageUrl: evt.attachment.url });
           consumeNote(el, '');
         }
         return;
@@ -1117,9 +1118,9 @@
       try{ n = JSON.parse(evt.message); }catch(err){ return; }
       if(!n || !n.id || !n.sender || typeof n.text !== 'string') return;
       noteTurn(n.sender, n.ts);
-      if(n.sender === otherId && !seenIds.has(n.id)){
+      if(!seenIds.has(n.id)){
         seenIds.add(n.id);
-        const el = addNote({ text: n.text, ts: n.ts, mine: false });
+        const el = addNote({ text: n.text, ts: n.ts, mine: n.sender === myId });
         consumeNote(el, n.text);
       }
     };
