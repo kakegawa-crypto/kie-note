@@ -339,6 +339,21 @@
     color: #c0524a;
     font-weight: 500;
   }
+  header.padtop .hdr-right{
+    display:flex;
+    align-items:center;
+    gap: 10px;
+  }
+  .close-link{
+    background:none;
+    border:none;
+    color: var(--ink-dim);
+    font-size: 11px;
+    text-decoration: underline;
+    cursor:pointer;
+    padding:0;
+    font-family: 'Noto Sans JP', sans-serif;
+  }
 
   #sheet, #realSheet{
     flex:1;
@@ -554,7 +569,10 @@
   <div class="rings"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
   <header class="padtop">
     <span class="name">メモ</span>
-    <span class="which" id="whichNote"></span>
+    <div class="hdr-right">
+      <span class="which" id="whichNote"></span>
+      <button id="padClose" type="button" class="close-link">閉じる</button>
+    </div>
   </header>
   <div id="sheet">
     <div class="empty" id="emptyMsg">メモはありません。</div>
@@ -673,6 +691,7 @@
   const dbgLog = document.getElementById('dbgLog');
   const dbgClose = document.getElementById('dbgClose');
   const pad = document.getElementById('pad');
+  const padClose = document.getElementById('padClose');
   const sheet = document.getElementById('sheet');
   const emptyMsg = document.getElementById('emptyMsg');
   const whichNote = document.getElementById('whichNote');
@@ -877,6 +896,24 @@
   realBack.addEventListener('click', ()=>{
     realPad.style.display = 'none';
     pinScreen.style.display = 'block';
+    pinInput.value = '';
+    pinError.textContent = '';
+    pinInput.focus();
+  });
+
+  padClose.addEventListener('click', ()=>{
+    if(mainEventSource){
+      mainEventSource.close();
+      mainEventSource = null;
+    }
+    pad.style.display = 'none';
+    pinScreen.style.display = 'block';
+    myId = null;
+    otherId = null;
+    seenIds.clear();
+    sheet.querySelectorAll('.note').forEach(el => el.remove());
+    emptyMsg.style.display = 'block';
+    whichNote.classList.remove('awaiting');
     pinInput.value = '';
     pinError.textContent = '';
     pinInput.focus();
