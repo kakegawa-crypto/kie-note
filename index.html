@@ -345,15 +345,17 @@
     gap: 10px;
   }
   .close-link{
-    background:none;
-    border:none;
+    background: var(--card);
+    border: 1px solid var(--card-edge);
     color: var(--ink-dim);
     font-size: 11px;
-    text-decoration: underline;
     cursor:pointer;
-    padding:0;
+    padding: 5px 12px;
+    border-radius: 999px;
     font-family: 'Noto Sans JP', sans-serif;
+    box-shadow: 0 1px 3px rgba(60,50,30,0.08);
   }
+  .close-link:active{ transform: scale(.96); }
 
   #sheet, #realSheet{
     flex:1;
@@ -595,7 +597,7 @@
   <div class="rings"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
   <header class="padtop">
     <span class="name">メモ</span>
-    <button id="realBack" type="button" class="which" style="cursor:pointer;">閉じる</button>
+    <button id="realBack" type="button" class="close-link">閉じる</button>
   </header>
   <div id="realSheet">
     <div class="empty" id="realEmptyMsg">メモはありません。</div>
